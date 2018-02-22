@@ -97,7 +97,7 @@ def _cnn_model_fn(features, labels, mode):
     probabilities = tf.nn.softmax(logits, name='softmax_tensor')
 
   if mode in (Modes.TRAIN, Modes.EVAL):
-    global_step = tf.contrib.framework.get_or_create_global_step()
+    global_step = tf.train.get_or_create_global_step()
     label_indices = tf.cast(labels, tf.int32)
     loss = tf.losses.softmax_cross_entropy(
         onehot_labels=tf.one_hot(label_indices, depth=10), logits=logits)
@@ -116,7 +116,7 @@ def _cnn_model_fn(features, labels, mode):
 
   if mode == Modes.TRAIN:
     optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
-    train_op = optimizer.minimize(loss, global_step=global_step)
+    train_op = tf.train.AdagradOptimizer(0.01).minimize(loss, global_step=global_step)
     return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)
 
   if mode == Modes.EVAL:
